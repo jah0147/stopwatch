@@ -1,73 +1,44 @@
 #include <chrono>
-#include <thread>
-#include <Windows.h>
+#include <iomanip>
 #include <iostream>
-#include <fstream>
-using namespace std;
-using namespace std::this_thread; // sleep_for, sleep_until
-using namespace std::chrono; // nanoseconds, system_clock, seconds
-
-void DELAY_IN_MILLISECONDS(int millisec) {
-    sleep_until(system_clock::now() + milliseconds (millisec));
-}
-void clearConsole()
-{
-    system( "CLS");
-}
-struct Time {
-    //unsigned int tick = 0;
-    unsigned int millisec = 0;
-    unsigned int sec = 0;
-    unsigned int min = 0;
-    unsigned int hr = 0;
-    //unsigned int days = 0;
-} timeAm;
+#include <thread>
+#include "windows.h"
 
 int main()
 {
-    cout << "Started stopwatch" << endl;
-    while (true)
-    {
-        //listens if user presses stop key
-        //stop key is ESC
-        //This should also write the time to a textFile
+    using std::chrono::duration_cast;
+    using std::chrono::milliseconds;
+    using Clock = std::chrono::steady_clock;
 
-        if (GetKeyState(VK_ESCAPE) & 0x8000)
+    std::cout << std::setfill('0');
+
+    auto tbegin = Clock::now();
+    unsigned long elapsedMilli = -1U;
+
+    do {
+        Clock::duration elapsed = Clock::now() - tbegin;
+        unsigned long ms = duration_cast<milliseconds>(elapsed).count();
+        if (elapsedMilli == ms)
         {
-            ofstream File("time.txt");
-            File << "[" << timeAm.hr << " Hours] "
-                 << "[" << timeAm.hr << " Minutes]"
-                 << "[" << timeAm.min << " Seconds]"
-                 << "[" << timeAm.sec << " Milliseconds]";
-            File.close();
-            return 0;
+            std::this_thread::sleep_until(tbegin + milliseconds(ms + 1));
+            continue;
         }
-        //DELAY_IN_MILLISECONDS(1); //1 second delay
-        //seconds
-        timeAm.millisec++;
-        //minutes
-        if (timeAm.millisec > 59)
-        {
-            timeAm.millisec = 0;
-            timeAm.sec++;
-        }
-        //hours
-        if (timeAm.sec > 59)
-        {
-            timeAm.sec = 0;
-            timeAm.min++;
-        }
-        //days
-        if (timeAm.min > 23)
-        {
-            timeAm.min = 0;
-            timeAm.hr++;
-        }
-        clearConsole(); //clears console
-        //prints to console
-        cout << "[" << timeAm.hr << " Hours] "
-             << "[" << timeAm.hr << " Minutes]"
-             << "[" << timeAm.min << " Seconds]"
-             << "[" << timeAm.sec << " Milliseconds]";
-    }
+        elapsedMilli = ms;
+
+        // Build time
+        unsigned int t_millisec = ms % 1000; ms /= 1000;
+        unsigned int t_sec = ms % 60; ms /= 60;
+        unsigned int t_min = ms % 60; ms /= 60;
+        unsigned int t_hr = ms % 24; ms /= 24;
+        //unsigned int t_days = ms;
+        system("CLS"); //clears screen
+        // Display time
+        std::cout << "["
+                  << std::setw(2) << t_hr << ":"
+                  << std::setw(2) << t_min << ":"
+                  << std::setw(2) << t_sec << "."
+                  << std::setw(3) << t_millisec << "]\n";
+
+    } while (elapsedMilli != -1);
+
 }
