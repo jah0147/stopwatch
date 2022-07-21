@@ -43,10 +43,15 @@ int main()
         system("CLS"); //clears screen
         // Display time
         std::cout << "["
-                  << std::setw(2) << t_hr << " hr :"
-                  << std::setw(2) << t_min << " min :"
-                  << std::setw(2) << t_sec << " sec :"
-                  << std::setw(3) << t_millisec << " ms]\n";
+                  << std::setw(2) << "Hr" << ":"
+                  << std::setw(2) << "Min" << ":"
+                  << std::setw(3) << "Sec" << ":"
+                  << std::setw(2) << "MS" << "]\n";
+        std::cout << "["
+                  << std::setw(2) << t_hr << ":"
+                  << std::setw(2) << t_min << ":"
+                  << std::setw(2) << t_sec << ":"
+                  << std::setw(3) << t_millisec << "]\n";
 
         //stores time for later printing
         storeTime.millisec = t_millisec;
@@ -63,6 +68,11 @@ int main()
         if (GetKeyState('Y') & 0x8000) {
             std::ofstream file("time.txt");
             file << "["
+                    << std::setw(2) << "Hr" << ":"
+                    << std::setw(2) << "Min" << ":"
+                    << std::setw(3) << "Sec" << ":"
+                    << std::setw(2) << "MS" << "]\n"
+                 << "["
                  << std::setw(2) << storeTime.hr << ":"
                  << std::setw(2) << storeTime.min << ":"
                  << std::setw(2) << storeTime.sec << ":"
