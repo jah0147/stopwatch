@@ -2,7 +2,16 @@
 #include <iomanip>
 #include <iostream>
 #include <thread>
+#include <fstream>
 #include "windows.h"
+
+struct storeTime {
+    unsigned int millisec = 0;
+    unsigned int sec = 0;
+    unsigned int min = 0;
+    unsigned int hr = 0;
+    unsigned int day = 0;
+} storeTime;
 
 int main()
 {
@@ -34,11 +43,39 @@ int main()
         system("CLS"); //clears screen
         // Display time
         std::cout << "["
-                  << std::setw(2) << t_hr << ":"
-                  << std::setw(2) << t_min << ":"
-                  << std::setw(2) << t_sec << "."
-                  << std::setw(3) << t_millisec << "]\n";
+                  << std::setw(2) << t_hr << " hr :"
+                  << std::setw(2) << t_min << " min :"
+                  << std::setw(2) << t_sec << " sec :"
+                  << std::setw(3) << t_millisec << " ms]\n";
 
-    } while (elapsedMilli != -1);
+        //stores time for later printing
+        storeTime.millisec = t_millisec;
+        storeTime.sec = t_sec;
+        storeTime.min = t_min;
+        storeTime.hr = t_hr;
+    } while (!(GetKeyState(VK_RETURN) & 0x8000));
 
+    std::string usrIn;
+    std::cout << "\nWould you like to store the time in a text file? (Y/N)" << std::endl;
+
+    while (true) {
+
+        if (GetKeyState('Y') & 0x8000) {
+            std::ofstream file("time.txt");
+            file << "["
+                 << std::setw(2) << storeTime.hr << ":"
+                 << std::setw(2) << storeTime.min << ":"
+                 << std::setw(2) << storeTime.sec << ":"
+                 << std::setw(3) << storeTime.millisec << "]\n";
+
+            std::cout << "The time has been saved";
+            std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds (3)); //3 sec delay
+            return 0;
+        } else if (GetKeyState('N') & 0x8000) {
+            std::cout << "Goodbye";
+            std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds (1)); //1 sec delay
+
+            return 0;
+        }
+    }
 }
