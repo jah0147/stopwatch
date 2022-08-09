@@ -13,6 +13,8 @@ struct storeTime {
     unsigned int day = 0;
 } storeTime;
 
+bool waitForKeyInput = false; //used to wait for user key input
+
 int main()
 {
     using std::chrono::duration_cast;
@@ -63,7 +65,7 @@ int main()
     std::string usrIn;
     std::cout << "\nWould you like to store the time in a text file? (Y/N)" << std::endl;
 
-    while (true) {
+    while (!waitForKeyInput) {
 
         if (GetKeyState('Y') & 0x8000) {
             std::ofstream file("time.txt");
@@ -80,12 +82,12 @@ int main()
 
             std::cout << "The time has been saved";
             std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds (3)); //3 sec delay
-            return 0;
+            waitForKeyInput = true;
         } else if (GetKeyState('N') & 0x8000) {
             std::cout << "Goodbye";
             std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::seconds (1)); //1 sec delay
-
-            return 0;
+            waitForKeyInput = true;
         }
     }
+    return 0;
 }
